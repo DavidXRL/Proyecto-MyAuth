@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Post; 
+use App\Http\Controllers\PostController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -46,7 +49,12 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::get('/posts', function () {
-    return view('posts');
-}) -> name('posts.index');
+//RUTA PERSONALIZADA PARA MANDAR A LLAMAR LA FUNCIÓN DE INDEX Y MOSTRAR LOS POSTEOS 
+Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+
+//RUTA PERSONALIZADA PARA CREAR EL REGISTRO EN LA BD DE POSTS
+Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+
+
+
 require __DIR__.'/auth.php';
