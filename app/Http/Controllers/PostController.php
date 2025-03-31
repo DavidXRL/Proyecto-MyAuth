@@ -12,7 +12,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        return view('posts');
+        return view ('posts/index',[
+            'posts' => Post::with('user')->latest()->get(),
+        ]);
     }
 
     /**
@@ -20,16 +22,35 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'message'=> ['required','min:8'],
+        // $request->validate([
+        //     'message'=> ['required','min:8'],
+        // ]);
+
+
+
+
+
+        //VALIDACIONES
+        $dataValidates = $request->validate([
+            'message' => ['required', 'min:8', 'max:255'],
         ]);
 
-        $message = request('message');
-        Post::create([
-            // 'message' => $message,
-            'message'=>$request->get('message'),
-            'user_id'=>auth()->id(),
-        ]);
+
+        // $message = request('message');
+
+        //     // 'message' => $message,
+        //     'message'=>$request->get('message'),
+        //     'user_id'=>auth()->id(),
+
+
+        //Genera un registro a través de una relación hasmany
+        // primero accediendo al user desde el request, luego al post desde user y finalmente
+        // a create desde post, ahora solo pasar los datos
+        @dump($dataValidates);
+        $request -> user()->posts()->create($dataValidates);
+        // ([
+        //     'message' => $request->get('message'),
+        // ]);
         return to_route('posts.index')-> with('status', __('Post created successfully!'));
     }
 
@@ -46,7 +67,17 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+
+        // if(auth()->user()->id != $post->user_id){
+        //     abort(403);
+        // }
+        $this->authorize('update', $post);
+
+
+        // return view('post/edit', compact('post'));
+        return view('posts/edit',[
+            'post'=> $post
+        ]);
     }
 
     /**
@@ -54,7 +85,20 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+
+        // if(auth()->user()->id != $post->user_id){
+        //     abort(403);
+        // }
+
+        $this->authorize('update', $post);
+
+        $dataValidates = $request->validate([
+            'message' => ['required', 'min:8', 'max:255'],
+        ]);
+
+        $post->update($dataValidates);
+
+        return to_route('posts.index')-> with('status', __('Post updated successfully!'));
     }
 
     /**
@@ -62,6 +106,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $this->authorize('delete', $post);
+        $post ->delete();
+        return to_route('posts.index')-> with('status', __('Post deleted successfully!'));
     }
 }

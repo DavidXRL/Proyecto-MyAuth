@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Models\Post; 
+use App\Models\Post;
 use App\Http\Controllers\PostController;
 
 
@@ -49,12 +49,19 @@ Route::middleware('auth')->group(function () {
 });
 
 
-//RUTA PERSONALIZADA PARA MANDAR A LLAMAR LA FUNCIÓN DE INDEX Y MOSTRAR LOS POSTEOS 
+//RUTA PERSONALIZADA PARA MANDAR A LLAMAR LA FUNCIÓN DE INDEX Y MOSTRAR LOS POSTEOS
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 
 //RUTA PERSONALIZADA PARA CREAR EL REGISTRO EN LA BD DE POSTS
 Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
 
+//RUTA PARA EDITAR
+Route::get('/posts/{post}/edit', [App\Http\Controllers\PostController::class, 'edit'])->name('posts.edit');
 
+//RUTA PARA UPDATE
+Route::patch('/posts/{post}', [App\Http\Controllers\PostController::class, 'update'])->name('posts.update');
+
+//RUTA PARA ELIMINAR
+Route::delete('/posts/{post}', [App\Http\Controllers\PostController::class, 'destroy'])->name('posts.destroy');
 
 require __DIR__.'/auth.php';
